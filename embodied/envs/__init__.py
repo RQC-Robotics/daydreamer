@@ -12,6 +12,7 @@ from .hrlgrid import HRLGrid
 from .loconav import LocoNav
 from .minecraft import Minecraft
 from .a1 import A1
+from .ur5e import UR5e
 
 
 def load_env(
@@ -64,6 +65,10 @@ def load_single_env(
     from .robot_interface import PickPlace, EnvConfig, RobotType
     assert task in ('real', 'dummy')
     env = PickPlace(EnvConfig(use_real=task == 'real', robot_type=RobotType.UR5))
+  elif suite == 'ur5e':
+    assert size == (64, 64), size
+    assert task in ('real', 'dummy')
+    env = UR5e(task)
   elif suite == 'sphero':
     from .sphero import SpheroEnv, EnvConfig
     assert task in ('real', 'dummy')

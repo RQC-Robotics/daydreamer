@@ -6,23 +6,27 @@ from ur_env.remote import RemoteEnvClient
 
 class UR5e(embodied.Env):
 
-    def __init__(self, address, repeat=1):
-        print("All images must be of a size (64, 64)")
-        self._env = RemoteEnvClient(address)
+    def __init__(self, task, repeat=1):
+        # TODO: dummy and real version needed to obtain proper env_spaces.
+        # describe env_specs by hand
+        if task == 'real':
+            address = ('10.201.2.136', 5555)
+            self._env = RemoteEnvClient(address)
+        else:
+            self._env = None
+        self._task = task
         self._repeat = repeat
-
         self._done = True
-        self._ignored_keys = []
-        for key, value in self._env.observation_spec().items():
-            if value.shape == (0,):
-                print(f"Ignoring empty observation key '{key}'.")
-                self._ignored_keys.append(key)
 
     @property
     def obs_space(self):
-        spaces = self._env.observation_spec().copy()
-        for key, space in spaces.items():
-            spaces[key] = embodied.Space(space.dtype, space.shape)
+        spaces = {
+            'kinect/image': embodied.Space(np.uint8, (64, 64, 3)),
+            'ActualTCPPose': embodied.Space(np.float32, (3,)),
+            'ActualQ': embodied.Space(np.float32, (6,)),
+            'gripper_pos': embodied.Space(np.float32, (1,)),
+            'object_detected': embodied.Space(np.float32, (1,)),
+        }
         spaces.update(
             reward=embodied.Space(np.float32),
             is_first=embodied.Space(bool),
@@ -33,10 +37,10 @@ class UR5e(embodied.Env):
 
     @property
     def act_space(self):
-        spec = self._env.action_spec()
+        lim = np.full((4,), 1.)
         return {
             'action': embodied.Space(
-                np.float32, spec.shape, spec.minimum, spec.maximum),
+                np.float32, None, -lim, lim),
             'reset': embodied.Space(bool)
         }
 
@@ -59,8 +63,7 @@ class UR5e(embodied.Env):
     def _obs(self, time_step, reward):
         obs = {
             k: v[None] if v.shape == () else v
-            for k, v in dict(time_step.observation).items()
-            if k not in self._ignored_keys
+            for k, v in time_step.observation.items()
         }
         return dict(
             reward=reward,
@@ -71,4 +74,5 @@ class UR5e(embodied.Env):
         )
 
     def close(self):
-        self._env.close()
+        if self._task == 'real':
+            self._env.close()

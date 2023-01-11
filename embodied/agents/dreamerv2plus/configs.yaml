@@ -295,31 +295,23 @@ ur5:
    train.train_fill: 2000
 
 ur5_ours:
-  # assure replay buffer, image sizes
 
-  task: ur5_dummy
+  task: ur5e_dummy
   run: train
-  encoder: { mlp_keys: '.*', cnn_keys: 'kinect/image' }
-  decoder: { mlp_keys: '.*', cnn_keys: 'kinect/image' }
+  encoder: { mlp_keys: 'ur5e.*', cnn_keys: 'kinect.*' }
+  decoder: { mlp_keys: 'ur5e.*', cnn_keys: 'kinect.*' }
   batch_size: 32
   replay_chunk: 32
-  env.amount: 1
-  env.repeat: 1
-  env.parallel: none
-  env.restart: False
-  train.train_every: 4
+  replay_fixed.minlen: 10
+  tf.precision: float16
+  env: { amount: 1, repeat: 1, parallel: none, resets: True, restart: False, length: 100 }
+  train: { train_every: 4, log_every: 100, eval_every: 200, sync_every: 20, eval_eps: 5, train_fill: 2000 }
   actent.target: 0.4
   discount: 0.995
   rssm: { deter: 512, units: 512 }
-  train.log_every: 100
-  train.eval_every: 200
-  train.sync_every: 20
   actor.minstd: 0.1
   actor.unimix: 0.1
-  train.log_keys_video: [ "kinect/image" ]
-  env.resets: True
-  env.length: 100
-  train.train_fill: 2000
+  train.log_keys_video: [ 'kinect/image' ]
 
 sphero:
 
