@@ -22,10 +22,11 @@ class UR5e(embodied.Env):
     def obs_space(self):
         spaces = {
             'kinect/image': embodied.Space(np.uint8, (64, 64, 3)),
-            'ActualTCPPose': embodied.Space(np.float32, (3,)),
-            'ActualQ': embodied.Space(np.float32, (6,)),
-            'gripper_pos': embodied.Space(np.float32, (1,)),
-            'object_detected': embodied.Space(np.float32, (1,)),
+            'arm/ActualTCPPose': embodied.Space(np.float32, (6,)),
+            'arm/ActualQ': embodied.Space(np.float32, (6,)),
+            'gripper/pos': embodied.Space(np.float32, (1,)),
+            'gripper/is_closed': embodied.Space(np.float32, (1,)),
+            'gripper/object_detected': embodied.Space(np.float32, (1,)),
         }
         spaces.update(
             reward=embodied.Space(np.float32),
@@ -37,7 +38,7 @@ class UR5e(embodied.Env):
 
     @property
     def act_space(self):
-        lim = np.full((4,), 1.)
+        lim = np.full((3,), 1.)
         return {
             'action': embodied.Space(
                 np.float32, None, -lim, lim),
@@ -61,16 +62,12 @@ class UR5e(embodied.Env):
         return self._obs(time_step, reward)
 
     def _obs(self, time_step, reward):
-        obs = {
-            k: v[None] if v.shape == () else v
-            for k, v in time_step.observation.items()
-        }
         return dict(
             reward=reward,
             is_first=time_step.first(),
             is_last=time_step.last(),
             is_terminal=time_step.discount == 0,
-            **obs,
+            **time_step.observation,
         )
 
     def close(self):

@@ -298,11 +298,11 @@ ur5_ours:
 
   task: ur5e_dummy
   run: train
-  encoder: { mlp_keys: 'ur5e.*', cnn_keys: 'kinect.*' }
-  decoder: { mlp_keys: 'ur5e.*', cnn_keys: 'kinect.*' }
-  batch_size: 32
-  replay_chunk: 32
-  replay_fixed.minlen: 10
+  encoder: { mlp_keys: '(arm|gripper).*', cnn_keys: 'kinect.*' }
+  decoder: { mlp_keys: '(arm|gripper).*', cnn_keys: 'kinect.*' }
+  batch_size: 64
+  replay_chunk: 16
+  replay_fixed.minlen: 16
   tf.precision: float16
   env: { amount: 1, repeat: 1, parallel: none, resets: True, restart: False, length: 100 }
   train: { train_every: 4, log_every: 100, eval_every: 200, sync_every: 20, eval_eps: 5, train_fill: 2000 }

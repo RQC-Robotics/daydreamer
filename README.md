@@ -101,6 +101,14 @@ CUDA_VISIBLE_DEVICES=0 python embodied/agents/dreamerv2plus/train.py --configs u
 CUDA_VISIBLE_DEVICES=1 python embodied/agents/dreamerv2plus/train.py --configs ur5 --run acting --task ur5_real --env.kbreset True --tf.platform cpu --tf.jit False --logdir ~/logdir/run11
 ```
 
+UR5 (ours)
+```
+CUDA_VISIBLE_DEVICES=0 python embodied/agents/dreamerv2plus/train.py --configs ur5_ours --run learning --task ur5e_dummy --tf.platform gpu --logdir logdir/run1
+```
+```
+CUDA_VISIBLE_DEVICES=1 python embodied/agents/dreamerv2plus/train.py --configs ur5_ours --run acting --task ur5e_real --tf.platform cpu --tf.jit False --logdir logdir/run1
+```
+
 ## Questions
 
 Please [open an issue][issues] on Github.
