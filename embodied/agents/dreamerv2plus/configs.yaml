@@ -300,18 +300,17 @@ ur5_ours:
   run: train
   encoder: { mlp_keys: '(arm|gripper).*', cnn_keys: 'kinect.*' }
   decoder: { mlp_keys: '(arm|gripper).*', cnn_keys: 'kinect.*' }
-  batch_size: 64
-  replay_chunk: 16
-  replay_fixed.minlen: 16
-  tf.precision: float16
+  batch_size: 32
+  replay_chunk: 32
   env: { amount: 1, repeat: 1, parallel: none, resets: True, restart: False, length: 100 }
-  train: { train_every: 4, log_every: 100, eval_every: 200, sync_every: 20, eval_eps: 5, train_fill: 2000 }
+  env.address: ['localhost', 5555]
+  train: { train_every: 4, log_every: 100, eval_every: 200, sync_every: 20, train_fill: 2000 }
   actent.target: 0.4
   discount: 0.995
   rssm: { deter: 512, units: 512 }
   actor.minstd: 0.1
   actor.unimix: 0.1
-  train.log_keys_video: [ 'kinect/image' ]
+  train.log_keys_video: [ 'kinect/image', 'kinect/depth']
 
 sphero:
 

@@ -38,7 +38,7 @@ def load_env(
 def load_single_env(
     task, size=(64, 64), repeat=1, mode='train', camera=-1, gray=False,
     length=0, logdir='/dev/null', discretize=0, sticky=True, lives=False,
-    episodic=True, resets=True, seed=None):
+    episodic=True, resets=True, seed=None, address=None):
   suite, task = task.split('_', 1)
   if suite == 'dummy':
     env = Dummy(task, size, length or 100)
@@ -68,7 +68,7 @@ def load_single_env(
   elif suite == 'ur5e':
     assert size == (64, 64), size
     assert task in ('real', 'dummy')
-    env = UR5e(task)
+    env = UR5e(task, address, repeat=repeat)
   elif suite == 'sphero':
     from .sphero import SpheroEnv, EnvConfig
     assert task in ('real', 'dummy')

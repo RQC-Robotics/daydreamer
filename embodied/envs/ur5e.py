@@ -1,16 +1,19 @@
+from typing import Tuple
+
 import embodied
 import numpy as np
 
 from ur_env.remote import RemoteEnvClient
 
+Address = Tuple[str, int]
+
 
 class UR5e(embodied.Env):
 
-    def __init__(self, task, repeat=1):
+    def __init__(self, task, address: Address, repeat=1):
         # TODO: dummy and real version needed to obtain proper env_spaces.
         # describe env_specs by hand
         if task == 'real':
-            address = ('10.201.2.136', 5555)
             self._env = RemoteEnvClient(address)
         else:
             self._env = None
@@ -20,12 +23,14 @@ class UR5e(embodied.Env):
 
     @property
     def obs_space(self):
+        # One cannot obtain env.observation_spec() from learners dummy env.
+        # So obs_space remains to be hardcoded.
         spaces = {
             'kinect/image': embodied.Space(np.uint8, (64, 64, 3)),
+            'kinect/depth': embodied.Space(np.uint8, (64, 64, 1)),
             'arm/ActualTCPPose': embodied.Space(np.float32, (6,)),
             'arm/ActualQ': embodied.Space(np.float32, (6,)),
             'gripper/pos': embodied.Space(np.float32, (1,)),
-            'gripper/is_closed': embodied.Space(np.float32, (1,)),
             'gripper/object_detected': embodied.Space(np.float32, (1,)),
         }
         spaces.update(
@@ -38,7 +43,7 @@ class UR5e(embodied.Env):
 
     @property
     def act_space(self):
-        lim = np.full((3,), 1.)
+        lim = np.full((4,), 1.)
         return {
             'action': embodied.Space(
                 np.float32, None, -lim, lim),
